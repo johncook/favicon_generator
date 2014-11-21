@@ -16,21 +16,25 @@
       .click(function() {
         var color = $(this).css('background-color');
 
-        var rgb2hex = (function(rgb) {
-          if (rgb.search("rgb") == -1)
-            return rgb;
-          else {
-            rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-            function hex(x) {
-              return ("0" + parseInt(x).toString(16)).slice(-2);
-            }
-            return ("#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]));
-          }
-        });
-
-        color = rgb2hex(color);
+        color = Drupal.favicon_generator.rgb2hex(color);
         $.farbtastic('.favicon_generator_colorpicker').setColor(color);
       });
     }
+  };
+
+  Drupal.favicon_generator = Drupal.favicon_generator || {};
+  Drupal.favicon_generator.rgb2hex = function(rgb) {
+    if (rgb.search("rgb") == -1)
+      return rgb;
+    else {
+      rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+      return ("#" +
+        Drupal.favicon_generator.hex(rgb[1]) +
+        Drupal.favicon_generator.hex(rgb[2]) + 
+        Drupal.favicon_generator.hex(rgb[3]));
+    }
+  };
+  Drupal.favicon_generator.hex = function(x) {
+    return ("0" + parseInt(x).toString(16)).slice(-2);
   };
 })(jQuery);
