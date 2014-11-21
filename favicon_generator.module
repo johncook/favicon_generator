@@ -54,7 +54,7 @@ function favicon_generator_theme_form_submit($form, &$form_state) {
   // TODO: Re-write fast-fail code.
   $values = $form_state['values'];
   $settings = variable_get($values['var'], '');
-  if (is_empty($settings) {
+  if (is_empty($settings)) {
     return;
   }
 
