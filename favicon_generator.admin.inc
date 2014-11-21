@@ -2,14 +2,15 @@
 
 /**
  * @file
+ * Contains admin UI.
  *
  * @author JohnCook
  */
 
 /**
- * Implements hook_settings
+ * Implements hook_settings().
  */
-function favicon_generator_settings(){
+function favicon_generator_settings() {
   $form = array();
 
   $form['#attached']['js'] = array(
@@ -18,19 +19,19 @@ function favicon_generator_settings(){
   );
   $form['#attached']['css'] = array(
     'misc/farbtastic/farbtastic.css',
-    drupal_get_path('module', 'favicon_generator') . '/favicon_generator.css',    
+    drupal_get_path('module', 'favicon_generator') . '/favicon_generator.css',
   );
 
-  // Background Color
+  // Background Color.
   $form['favicon_generator_color'] = array(
     '#type' => 'textfield',
     '#title' => t('Background Color'),
     '#default_value' => variable_get('favicon_generator_color', '#00aba9'),
     '#description' => '<div class="colorpicker"></div>',
     '#size' => 7,
-    '#maxlength' =>7,
+    '#maxlength' => 7,
   );
-  // Add presets
+  // Add presets.
   $colors = array(
     '00aba9' => t('Teal'),
     '2d89ef' => t('Blue'),
@@ -43,27 +44,27 @@ function favicon_generator_settings(){
     '9f00a7' => t('Light Purple'),
   );
   $form['favicon_generator_color']['#description'] .= '<div class="color-presets">';
-  foreach($colors as $hex => $name) {
+  foreach ($colors as $hex => $name) {
     $form['favicon_generator_color']['#description'] .=
-      '<div class="color-preset" style="background-color: #' . $hex .';" >' . $name . '<br/>#' . $hex . '</div>';
+      '<div class="color-preset" style="background-color: #' . $hex . ';" >' . $name . '<br/>#' . $hex . '</div>';
   }
   $form['favicon_generator_color']['#description'] .= '</ div>';
 
-  // Margin
+  // Margin.
   $form['favicon_generator_margin'] = array(
     '#type' => 'select',
     '#title' => t('Margin size (for a 57x57 icon)'),
     '#options' => array(
-       0 => t('0px'),
-       1 => t('1px'),
-       2 => t('2px'),
-       3 => t('3px'),
-       4 => t('4px'),
-       5 => t('5px'),
-       6 => t('6px'),
-       7 => t('7px'),
-       8 => t('8px'),
-       9 => t('9px'),
+      0 => t('0px'),
+      1 => t('1px'),
+      2 => t('2px'),
+      3 => t('3px'),
+      4 => t('4px'),
+      5 => t('5px'),
+      6 => t('6px'),
+      7 => t('7px'),
+      8 => t('8px'),
+      9 => t('9px'),
       10 => t('10px'),
       11 => t('11px'),
       12 => t('12px'),
@@ -74,8 +75,8 @@ function favicon_generator_settings(){
     '#default_value' => variable_get('favicon_generator_margin', 4),
   );
 
-  // IO Picture Aspect
-  // 57x57px
+  // IO Picture Aspect.
+  // 57x57px.
   $form['favicon_generator_ios'] = array(
     '#type' => 'select',
     '#title' => t('IOS Style'),
@@ -86,8 +87,8 @@ function favicon_generator_settings(){
     '#default_value' => variable_get('favicon_generator_ios', 'colored'),
   );
 
-  // Windows Picture Aspect
-  // 50x50 icon on 101x101 tile
+  // Windows Picture Aspect.
+  // 50x50 icon on 101x101 tile.
   $form['favicon_generator_windows'] = array(
     '#type' => 'select',
     '#title' => t('Windows 8 Style'),
@@ -98,7 +99,7 @@ function favicon_generator_settings(){
     '#default_value' => variable_get('favicon_generator_windows', 'colored'),
   );
 
-  // Firefox Picture Aspect
+  // Firefox Picture Aspect.
   $form['favicon_generator_ff'] = array(
     '#type' => 'select',
     '#title' => 'Firefox OS Style',
@@ -109,9 +110,9 @@ function favicon_generator_settings(){
     ),
     '#default_value' => variable_get('favicon_generator_ff', 'circle'),
   );
-  // TODO: 'keep picture in circle' option
+  /* TODO: 'keep picture in circle' option. */
 
-  // Android Picture Aspect
+  // Android Picture Aspect.
   $form['favicon_generator_android'] = array(
     '#type' => 'select',
     '#title' => 'Android Style',
@@ -122,9 +123,9 @@ function favicon_generator_settings(){
     ),
     '#default_value' => variable_get('favicon_generator_android', 'shadow'),
   );
-  // TODO: 'display' option
-  // TODO: 'orientation' option
-  // TODO: 'start url' option
+  /* TODO: 'display' option */
+  /* TODO: 'orientation' option */
+  /* TODO: 'start url' option */
 
   $form['favicon_generator_path'] = array(
     '#type' => 'textfield',
@@ -135,4 +136,3 @@ function favicon_generator_settings(){
 
   return system_settings_form($form);
 }
-

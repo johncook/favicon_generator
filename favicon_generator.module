@@ -1,40 +1,43 @@
 <?php
 /**
  * @file
+ * Favicon generator primary module file.
+ *
+ * Contains all the code except the admin UI.
  */
 
 /**
- * Implements hook_menu()
+ * Implements hook_menu().
  */
 function favicon_generator_menu() {
 
   $items = array();
 
   $items['admin/config/user-interface/favicon_generator'] = array(
-    'title' => t('Real Favicon Generator'),
-    'description' => t('Configure how the icons appear'),
+    'title' => 'Real Favicon Generator',
+    'description' => 'Configure how the icons appear',
     // TODO: Change permissions
     'access callback' => TRUE,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('favicon_generator_settings'),
     'file' => 'favicon_generator.admin.inc',
-    //'type' => MENU_NORMAL_ITEM,
+    // 'type' => MENU_NORMAL_ITEM,
   );
 
-  // Temp for testing
+  /* Temp for testing */
   $items['api/favicon'] = array(
     'title' => 'favicon_generator',
     'page callback' => 'favicon_generator_json_return',
     'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
-  // End Temp for testing
+  /* End Temp for testing */
 
   return $items;
 }
 
 /**
- * Implements hook_form_FORM_ID_alter
+ * Implements hook_form_FORM_ID_alter().
  *
  * Adds a callback when the theme settings page is saved.
  */
@@ -43,16 +46,23 @@ function favicon_generator_form_system_theme_settings_alter(&$form, &$form_state
 }
 
 /**
- * Implements hook_form_submit
+ * Implements hook_form_submit().
  *
- * Called via favicon_generator_form_system_theme_settings_alter
+ * Called via favicon_generator_form_system_theme_settings_alter.
  */
 function favicon_generator_theme_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   $settings = variable_get($values['var'], '');
-  $img_info = image_get_info($settings['favicon_path']);
+  $if (is_empty($settings) {
+    return;
+  }
 
-  // TODO: Process 'use default' option.
+  $img_info = image_get_info($settings['favicon_path']);
+  if ($img_info == FALSE) {
+    return;
+  }
+
+  /* TODO: Process 'use default' option. */
 
   $errors = FALSE;
   if ($img_info['width'] != $img_info['height']) {
@@ -85,9 +95,12 @@ function favicon_generator_theme_form_submit($form, &$form_state) {
 }
 
 /**
- * Implements hook_page_build.
+ * Implements hook_page_build().
  *
- * Adds html to pages
+ * Adds html to pages.
+ *
+ * @param $page
+ *   Nested array of renderable elements that make up the page.
  */
 function favicon_generator_page_build(&$page) {
   $html = theme_get_setting('favicon_generator_html');;
@@ -102,9 +115,12 @@ function favicon_generator_page_build(&$page) {
 }
 
 /**
- * Implements hook_html_head_alter
+ * Implements hook_html_head_alter().
  *
- * Removes the default favicon from the header
+ * Removes the default favicon from the header.
+ *
+ * @param $head_elements
+ *   An array of renderable elements.
  */
 function favicon_generator_html_head_alter(&$head_elements) {
   if (isset($head_elements['favicon_generator'])) {
@@ -118,7 +134,8 @@ function favicon_generator_html_head_alter(&$head_elements) {
  * @param $icon_filename
  *   The file name of the image to convert into an icon set.
  * @param $theme
- *  The name of the theme to apply the icon set to.
+ *   The name of the theme to apply the icon set to.
+ *
  * @return mixed
  *   An array of extra theme setting, or false if an error occurred.
  */
@@ -130,48 +147,50 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
 
   $response = drupal_http_request(
     'http://realfavicongenerator.net/api/favicon.php',
-    // Testing URL
-    //'http://localhost/api/favicon',
+    /*
+    Testing URL.
+    'http://localhost/api/favicon'
+    */
     array(
       'method' => 'POST',
       'data' => json_encode(_favicon_generator_get_request_array($icon_filename, $path_base)),
       'max_redirects' => 0,
       'headers' => array(
         'Content-Type' => 'application/json',
-        //'Accept' => 'application/json',
+        /* 'Accept' => 'application/json', */
       ),
     )
   );
 
   $r = json_decode($response->data);
 
-  // No JSON returned
+  // No JSON returned.
   if (!empty($r)) {
-    // TODO: Get out
+    // TODO: Get out.
   }
 
-  // Not a Real Favicon result
+  // Not a Real Favicon result.
   if (!isset($r->favicon_generation_result)) {
-    // TODO: Get out
+    // TODO: Get out.
   }
 
-  // Check for a result
+  // Check for a result.
   if (!isset($r->favicon_generation_result->result)) {
-    // TODO: Get out
+    // TODO: Get out.
   }
 
-  // Check for result->status
+  // Check for result->status.
   if (!isset($r->favicon_generation_result->result->status)) {
-    // TODO: Get out
+    // TODO: Get out.
   }
 
-  // Make sure the call was a success
+  // Make sure the call was a success.
   if (!($r->favicon_generation_result->result->status === 'success')) {
-    // TODO: Get out
+    // TODO: Get out.
   }
 
-  // All OK here
-  //$preview = $r->favicon_generation_result->preview_picture_url;
+  // All OK here.
+  /* $preview = $r->favicon_generation_result->preview_picture_url; */
   $package = $r->favicon_generation_result->favicon->package_url;
   $html = $r->favicon_generation_result->favicon->html_code;
   $path = $r->favicon_generation_result->files_location->path;
@@ -179,23 +198,25 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
 
   $path = file_build_uri($path_base);
 
-  // Create directory
+  // Create directory.
   file_prepare_directory(
     $path,
     FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS
   );
 
-  // Save preview image
-  //$response = drupal_http_request(
-  //  $preview,
-  //  array(
-  //    'method' => 'GET',
-  //  )
-  //);
-  //$preview_uri = $path . '/preview.png';
-  //file_unmanaged_save_data($response->data, $preview_uri, FILE_EXISTS_REPLACE);
+  /*
+  // Save preview image.
+  $response = drupal_http_request(
+    $preview,
+    array(
+      'method' => 'GET',
+    )
+  );
+  $preview_uri = $path . '/preview.png';
+  file_unmanaged_save_data($response->data, $preview_uri, FILE_EXISTS_REPLACE);
+  */
 
-  // Save zip file
+  // Save zip file.
   $response = drupal_http_request(
     $package,
     array(
@@ -207,14 +228,14 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
 
   $zip_path = variable_get('file_public_path', conf_path() . '/files') . '/' . file_uri_target($zip_uri);
 
-  // Unzip file
+  // Unzip file.
   $zip = new ZipArchive();
-  $res = $zip->open($zip_path);
+  $zip->open($zip_path);
   $zip->extractTo($path);
   $zip->close();
 
   $ret = array(
-    //'favicon_generator_preview' => $preview_uri,
+    /* 'favicon_generator_preview' => $preview_uri, */
     'favicon_generator_html' => $html,
     'favicon_generator_version' => $version,
   );
@@ -223,12 +244,15 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
 }
 
 /**
- * Helper function to build the Real Favicon json array
+ * Helper function to build the Real Favicon json array.
  *
- * @param $icon_filename
- *   The file name of the image to convert into an icon set.
- * @param $path
- *   The path which to save the icon files to. Relative to public://.
+ * @param string $icon_filename
+ *   A string containing the file name of the image to convert
+ *   into an icon set.
+ * @param string $path
+ *   A string containing the path which to save the icon files to.
+ *   Relative to public://.
+ *
  * @return array
  *   The json data as a PHP array.
  */
@@ -237,18 +261,17 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
     'favicon_generation' => array(
       'api_key' => 'ba2bae2dbffde5251857e412a8576c3ef259dd4b',
       'master_picture' => array(
-        //'type' => 'url',
-        //'url' => theme_get_setting('favicon'),
+        /* 'type' => 'url', */
+        /* 'url' => theme_get_setting('favicon'), */
         'type' => 'inline',
         'content' => base64_encode(file_get_contents($icon_filename)),
       ),
       'files_location' => array(
         'type' => 'path',
         'path' => '/' . variable_get('file_public_path', conf_path() . '/files') . '/' . $path,
-        //'path' =>  . variable_get('favicon_generator_path', ''),
+        /* 'path' =>  . variable_get('favicon_generator_path', ''), */
       ),
-      'favicon_design' => array(
-      ),
+      'favicon_design' => array(),
       'settings' => array(
         'compression' => '3',
         'scaling_algorithm' => 'Mitchell',
@@ -256,7 +279,7 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
     ),
   );
 
-  // iOS Settings
+  // iOS Settings.
   $ios = variable_get('favicon_generator_ios', 'colored');
   if ($ios == 'colored') {
     $request['favicon_generation']['favicon_design']['ios'] = array(
@@ -271,7 +294,7 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
     );
   }
 
-  // Windows 8 Settings
+  // Windows 8 Settings.
   $win = variable_get('favicon_generator_windows', 'colored');
   if ($win == 'colored') {
     $request['favicon_generation']['favicon_design']['windows'] = array(
@@ -286,7 +309,7 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
     );
   }
 
-  // Firefox Settings
+  // Firefox Settings.
   $ff = variable_get('favicon_generator_ff');
   if ($ff == 'circle') {
     $request['favicon_generation']['favicon_design']['firefox_app'] = array(
@@ -310,12 +333,14 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
       'background_color' => variable_get('favicon_generator_color', '#00aba9'),
     );
   }
-  //'app_name' => 'My sample app',
-  //'app_description' => 'Yet another sample application',
-  //'developer_name' => 'Philippe Bernard',
-  //'developer_url' => 'http://stackoverflow.com/users/499917/philippe-b',
+  /*
+  'app_name' => 'My sample app',
+  'app_description' => 'Yet another sample application',
+  'developer_name' => 'Philippe Bernard',
+  'developer_url' => 'http://stackoverflow.com/users/499917/philippe-b',
+  */
 
-  // Android Settings
+  // Android Settings.
   $android = variable_get('favicon_generator_android', 'shadow');
   if ($android == 'transparent') {
     $request['favicon_generation']['favicon_design']['android_chrome'] = array(
@@ -336,20 +361,21 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
   }
   $request['favicon_generation']['favicon_design']['android_chrome']['manifest'] = array(
     'name' => variable_get('site_name'),
-    //'display' => 'standalone',
-    //'orientation' => 'portrait',
-    //'start_url' => '/homepage.html',
+    /*
+    'display' => 'standalone',
+    'orientation' => 'portrait',
+    'start_url' => '/homepage.html',
+    */
   );
 
-  // TODO: Coast
+  /* TODO: Coast. */
 
   return $request;
 }
 
-// Temp for testing
+/* Temp for testing. */
 function favicon_generator_json_return() {
   $r = json_decode('{"favicon_generation_result":{"result":{"status":"success"},"favicon":{"package_url":"http:\/\/localhost\/favicons.zip","html_code":"<link rel=\"shortcut icon\" href=\"\/sites\/default\/files\/favicon\/favicon.ico\">\n<link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-57x57.png\">\n<link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-114x114.png\">\n<link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-72x72.png\">\n<link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-144x144.png\">\n<link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-60x60.png\">\n<link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-120x120.png\">\n<link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-76x76.png\">\n<link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-152x152.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-180x180.png\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-192x192.png\" sizes=\"192x192\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-160x160.png\" sizes=\"160x160\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-96x96.png\" sizes=\"96x96\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-16x16.png\" sizes=\"16x16\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-32x32.png\" sizes=\"32x32\">\n<meta name=\"msapplication-TileColor\" content=\"#00aba9\">\n<meta name=\"msapplication-TileImage\" content=\"\/sites\/default\/files\/favicon\/mstile-144x144.png\">\n<meta name=\"msapplication-config\" content=\"\/sites\/default\/files\/favicon\/browserconfig.xml\">\n<link rel=\"manifest\" href=\"\/sites\/default\/files\/favicon\/android_chrome_manifest.json\">","compression":"true"},"files_location":{"type":"path","path":"\/sites\/default\/files\/favicon"},"preview_picture_url":"http:\/\/localhost\/favicon_preview.png","version":"0.9"}}');
   drupal_json_output($r);
 }
-// End Temp for testing
-
+/* End Temp for testing. */
