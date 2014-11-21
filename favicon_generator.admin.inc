@@ -27,7 +27,7 @@ function favicon_generator_settings() {
     '#type' => 'textfield',
     '#title' => t('Background Color'),
     '#default_value' => variable_get('favicon_generator_color', '#00aba9'),
-    '#description' => '<div class="colorpicker"></div>',
+    '#description' => '<div class="favicon_generator_colorpicker"></div>',
     '#size' => 7,
     '#maxlength' => 7,
   );
