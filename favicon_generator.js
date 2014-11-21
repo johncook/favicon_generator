@@ -24,13 +24,14 @@
 
   Drupal.favicon_generator = Drupal.favicon_generator || {};
   Drupal.favicon_generator.rgb2hex = function(rgb) {
-    if (rgb.search("rgb") == -1)
+    if (rgb.search("rgb") == -1) {
       return rgb;
+    }
     else {
       rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
       return ("#" +
         Drupal.favicon_generator.hex(rgb[1]) +
-        Drupal.favicon_generator.hex(rgb[2]) + 
+        Drupal.favicon_generator.hex(rgb[2]) +
         Drupal.favicon_generator.hex(rgb[3]));
     }
   };
