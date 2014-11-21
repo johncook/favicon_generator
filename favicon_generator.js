@@ -16,7 +16,7 @@
       .click(function() {
         var color = $(this).css('background-color');
 
-        var rgb2hex = function (rgb) {
+        var rgb2hex = (function(rgb) {
           if (rgb.search("rgb") == -1)
             return rgb;
           else {
@@ -26,7 +26,7 @@
             }
             return ("#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]));
           }
-        };
+        });
 
         color = rgb2hex(color);
         $.farbtastic('.favicon_generator_colorpicker').setColor(color);
