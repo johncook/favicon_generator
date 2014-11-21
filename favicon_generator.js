@@ -7,16 +7,16 @@
 (function($) {
   Drupal.behaviors.favicon_generator = {
     attach: function(context, settings) {
-      // Attach color wheel behaviour
+      // Attach color wheel behaviour.
       $('.favicon_generator_colorpicker').farbtastic('#edit-favicon-generator-color');
 
-      // Attach onClick event for swatches
+      // Attach onClick event for swatches.
       $('.form-item-favicon-generator-color .color-preset:not(.favicon-generator-color-preset-processed)')
       .addClass('favicon-generator-color-preset-processed')
       .click(function() {
         var color = $(this).css('background-color');
 
-        function rgb2hex(rgb) {
+        var rgb2hex = function (rgb) {
           if (rgb.search("rgb") == -1)
             return rgb;
           else {
@@ -26,7 +26,7 @@
             }
             return ("#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]));
           }
-        }
+        };
 
         color = rgb2hex(color);
         $.farbtastic('.favicon_generator_colorpicker').setColor(color);
