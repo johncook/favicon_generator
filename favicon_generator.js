@@ -1,7 +1,7 @@
 /**
  * @file
  *
- * Favicon generator color picker function
+ * Favicon generator color picker function.
  */
 
 (function($) {
