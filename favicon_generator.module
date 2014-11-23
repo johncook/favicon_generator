@@ -54,7 +54,7 @@ function favicon_generator_theme_form_submit($form, &$form_state) {
   // TODO: Re-write fast-fail code.
   $values = $form_state['values'];
   $settings = variable_get($values['var'], '');
-  if (is_empty($settings)) {
+  if (empty($settings)) {
     return;
   }
 
@@ -89,9 +89,11 @@ function favicon_generator_theme_form_submit($form, &$form_state) {
     $array = variable_get($values['var'], array());
     $array = array_merge($array, $result);
     variable_set($values['var'], $array);
+    drupal_set_message(t('Favicons created'));
   }
-
-  drupal_set_message(t('Favicons created'));
+  else {
+    drupal_set_message(t('An error occurred while fetching the icon set. Please try again later.'), 'error');
+  }
 
 }
 
@@ -140,7 +142,7 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
     'http://realfavicongenerator.net/api/favicon.php',
     /*
     Testing URL.
-    'http://localhost/api/favicon'
+    'http://localhost/api/favicon',
     */
     array(
       'method' => 'POST',
@@ -156,36 +158,70 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
   $r = json_decode($response->data);
 
   // No JSON returned.
-  if (!empty($r)) {
-    // TODO: Get out.
+  if (empty($r)) {
+    watchdog('favicon_generator', 'No JSON data was received.', NULL, WATCHDOG_WARNING);
+    return FALSE;
   }
 
   // Not a Real Favicon result.
   if (!isset($r->favicon_generation_result)) {
-    // TODO: Get out.
+    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net', NULL, WATCHDOG_WARNING);
+    return FALSE;
   }
 
   // Check for a result.
   if (!isset($r->favicon_generation_result->result)) {
-    // TODO: Get out.
+    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net', NULL, WATCHDOG_WARNING);
+    return FALSE;
   }
 
   // Check for result->status.
   if (!isset($r->favicon_generation_result->result->status)) {
-    // TODO: Get out.
+    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net', NULL, WATCHDOG_WARNING);
+    return FALSE;
   }
 
   // Make sure the call was a success.
   if (!($r->favicon_generation_result->result->status === 'success')) {
-    // TODO: Get out.
+    if (isset($r->favicon_generation_result->result->error_message)) {
+      watchdog('favicon_generator',
+        'RealFaviconGenerator.net sent an error: %error_msg',
+        array('%error_msg' => $r->favicon_generation_result->result->error_message),
+        WATCHDOG_WARNING
+      );
+    }
+    else {
+      watchdog('favicon_generator',
+        'RealFaviconGenerator.net sent an error but no further details are available.',
+        NULL,
+        WATCHDOG_WARNING
+      );
+    }
+    return FALSE;
+  }
+
+  // Check for favicon section.
+  if (!isset($r->favicon_generation_result->favicon)) {
+    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net', NULL, WATCHDOG_WARNING);
+    return FALSE;
+  }
+
+  // Check for package URL.
+  if (!isset($r->favicon_generation_result->favicon->package_url)) {
+    watchdog('favicon_generator', 'JSON does not contain the package URL.', NULL, WATCHDOG_WARNING);
+    return FALSE;
+  }
+
+  // Check for html code.
+  if (!isset($r->favicon_generation_result->favicon->html_code)) {
+    watchdog('favicon_generator', 'JSON does not contain any HTML code.', NULL, WATCHDOG_WARNING);
+    return FALSE;
   }
 
   // All OK here.
-  /* $preview = $r->favicon_generation_result->preview_picture_url; */
   $package = $r->favicon_generation_result->favicon->package_url;
   $html = $r->favicon_generation_result->favicon->html_code;
-  $path = $r->favicon_generation_result->files_location->path;
-  $version = $r->favicon_generation_result->version;
+  $version = isset($r->favicon_generation_result->version) ? $r->favicon_generation_result->version : '0.0';
 
   $path = file_build_uri($path_base);
 
@@ -194,18 +230,6 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
     $path,
     FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS
   );
-
-  /*
-  // Save preview image.
-  $response = drupal_http_request(
-    $preview,
-    array(
-      'method' => 'GET',
-    )
-  );
-  $preview_uri = $path . '/preview.png';
-  file_unmanaged_save_data($response->data, $preview_uri, FILE_EXISTS_REPLACE);
-  */
 
   // Save zip file.
   $response = drupal_http_request(
@@ -368,7 +392,7 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
  * Temp for testing.
  */
 function favicon_generator_json_return() {
-  $r = json_decode('{"favicon_generation_result":{"result":{"status":"success"},"favicon":{"package_url":"http:\/\/localhost\/favicons.zip","html_code":"<link rel=\"shortcut icon\" href=\"\/sites\/default\/files\/favicon\/favicon.ico\">\n<link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-57x57.png\">\n<link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-114x114.png\">\n<link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-72x72.png\">\n<link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-144x144.png\">\n<link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-60x60.png\">\n<link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-120x120.png\">\n<link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-76x76.png\">\n<link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-152x152.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-180x180.png\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-192x192.png\" sizes=\"192x192\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-160x160.png\" sizes=\"160x160\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-96x96.png\" sizes=\"96x96\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-16x16.png\" sizes=\"16x16\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-32x32.png\" sizes=\"32x32\">\n<meta name=\"msapplication-TileColor\" content=\"#00aba9\">\n<meta name=\"msapplication-TileImage\" content=\"\/sites\/default\/files\/favicon\/mstile-144x144.png\">\n<meta name=\"msapplication-config\" content=\"\/sites\/default\/files\/favicon\/browserconfig.xml\">\n<link rel=\"manifest\" href=\"\/sites\/default\/files\/favicon\/android_chrome_manifest.json\">","compression":"true"},"files_location":{"type":"path","path":"\/sites\/default\/files\/favicon"},"preview_picture_url":"http:\/\/localhost\/favicon_preview.png","version":"0.9"}}');
+  $r = json_decode('{"favicon_generation_result":{"result":{"status":"success","error_message":"Invalid API key"},"favicon":{"package_url":"http:\/\/localhost\/favicons.zip","html_code":"<link rel=\"shortcut icon\" href=\"\/sites\/default\/files\/favicon\/favicon.ico\">\n<link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-57x57.png\">\n<link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-114x114.png\">\n<link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-72x72.png\">\n<link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-144x144.png\">\n<link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-60x60.png\">\n<link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-120x120.png\">\n<link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-76x76.png\">\n<link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-152x152.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-180x180.png\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-192x192.png\" sizes=\"192x192\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-160x160.png\" sizes=\"160x160\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-96x96.png\" sizes=\"96x96\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-16x16.png\" sizes=\"16x16\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-32x32.png\" sizes=\"32x32\">\n<meta name=\"msapplication-TileColor\" content=\"#00aba9\">\n<meta name=\"msapplication-TileImage\" content=\"\/sites\/default\/files\/favicon\/mstile-144x144.png\">\n<meta name=\"msapplication-config\" content=\"\/sites\/default\/files\/favicon\/browserconfig.xml\">\n<link rel=\"manifest\" href=\"\/sites\/default\/files\/favicon\/android_chrome_manifest.json\">","compression":"true"},"files_location":{"type":"path","path":"\/sites\/default\/files\/favicon"},"preview_picture_url":"http:\/\/localhost\/favicon_preview.png","versions":"0.9"}}');
   drupal_json_output($r);
 }
 /* End Temp for testing. */
