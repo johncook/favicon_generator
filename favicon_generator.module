@@ -165,33 +165,35 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
 
   // Not a Real Favicon result.
   if (!isset($r->favicon_generation_result)) {
-    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net', NULL, WATCHDOG_WARNING);
+    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net.', NULL, WATCHDOG_WARNING);
     return FALSE;
   }
 
   // Check for a result.
   if (!isset($r->favicon_generation_result->result)) {
-    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net', NULL, WATCHDOG_WARNING);
+    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net.', NULL, WATCHDOG_WARNING);
     return FALSE;
   }
 
   // Check for result->status.
   if (!isset($r->favicon_generation_result->result->status)) {
-    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net', NULL, WATCHDOG_WARNING);
+    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net.', NULL, WATCHDOG_WARNING);
     return FALSE;
   }
 
   // Make sure the call was a success.
   if (!($r->favicon_generation_result->result->status === 'success')) {
     if (isset($r->favicon_generation_result->result->error_message)) {
-      watchdog('favicon_generator',
+      watchdog(
+        'favicon_generator',
         'RealFaviconGenerator.net sent an error: %error_msg',
         array('%error_msg' => $r->favicon_generation_result->result->error_message),
         WATCHDOG_WARNING
       );
     }
     else {
-      watchdog('favicon_generator',
+      watchdog(
+        'favicon_generator',
         'RealFaviconGenerator.net sent an error but no further details are available.',
         NULL,
         WATCHDOG_WARNING
@@ -202,7 +204,7 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
 
   // Check for favicon section.
   if (!isset($r->favicon_generation_result->favicon)) {
-    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net', NULL, WATCHDOG_WARNING);
+    watchdog('favicon_generator', 'JSON does not appear to be from RealFaviconGenerator.net.', NULL, WATCHDOG_WARNING);
     return FALSE;
   }
 
@@ -225,36 +227,76 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
 
   $path = file_build_uri($path_base);
 
-  // Create directory.
-  file_prepare_directory(
+  // Create directory if necessary and make sure it's writable.
+  $dir_ok = file_prepare_directory(
     $path,
     FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS
   );
+  if (!$dir_ok) {
+    watchdog(
+      'favicon_generator',
+      'Icon directory, %path, does not exist and could not be created.',
+      array('%path' => $path),
+      WATCHDOG_WARNING
+    );
+    return FALSE;
+  }
 
-  // Save zip file.
+  // Download zip file.
   $response = drupal_http_request(
     $package,
     array(
       'method' => 'GET',
     )
   );
+
+  // Check for problems downloading file.
+  if (empty($response->data)) {
+    watchdog(
+      'favicon_generator',
+      'The icon package file, %package, could not be downloaded.',
+      array('%package' => $package),
+      WATCHDOG_WARNING
+    );
+    return FALSE;
+  }
+
+  // Save zip file.
   $zip_uri = $path . '/favicon.zip';
-  file_unmanaged_save_data($response->data, $zip_uri, FILE_EXISTS_REPLACE);
+  if (!file_unmanaged_save_data($response->data, $zip_uri, FILE_EXISTS_REPLACE)) {
+    watchdog(
+      'favicon_generator',
+      'The icon package could not be saved to %zip_uri.',
+      array('%zip_uri' => $zip_uri),
+      WATCHDOG_WARNING
+    );
+    return FALSE;
+  }
 
   $zip_path = variable_get('file_public_path', conf_path() . '/files') . '/' . file_uri_target($zip_uri);
 
   // Unzip file.
   $zip = new ZipArchive();
-  $zip->open($zip_path);
-  $zip->extractTo($path);
+  $res = $zip->open($zip_path);
+  if (!($res === TRUE)) {
+    watchdog(
+      'favicon_generator',
+      'There was a problem opening the package file: %err',
+      array('%err' => $res),
+      WATCHDOG_WARNING
+    );
+    return FALSE;
+  }
+  if (!$zip->extractTo($path)) {
+    watchdog('favicon_generator', 'There was a problem extracting the icon files.', NULL, WATCHDOG_WARNING);
+    return FALSE;
+  }
   $zip->close();
 
   $ret = array(
-    /* 'favicon_generator_preview' => $preview_uri, */
     'favicon_generator_html' => $html,
     'favicon_generator_version' => $version,
   );
-
   return $ret;
 }
 
