@@ -110,7 +110,17 @@ function favicon_generator_settings() {
     ),
     '#default_value' => variable_get('favicon_generator_ff', 'circle'),
   );
-  /* TODO: 'keep picture in circle' option. */
+  $form['favicon_generator_ff_incircle'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Keep picture in circle'),
+    '#description' => t('If checked, the icon is cropped in order to fit the circle. Else, the icon may extend beyond the circle.'),
+    '#default_value' => variable_get('favicon_generator_ff_incircle', 1),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="favicon_generator_ff"]' => array('value' => 'circle'),
+      ),
+    ),
+  );
 
   // Android Picture Aspect.
   $form['favicon_generator_android'] = array(
@@ -123,9 +133,6 @@ function favicon_generator_settings() {
     ),
     '#default_value' => variable_get('favicon_generator_android', 'shadow'),
   );
-  /* TODO: 'display' option */
-  /* TODO: 'orientation' option */
-  /* TODO: 'start url' option */
 
   $form['favicon_generator_path'] = array(
     '#type' => 'textfield',

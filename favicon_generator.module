@@ -373,7 +373,9 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
       'picture_aspect' => 'circle',
       'keep_picture_in_circle' => 'true',
       'circle_inner_margin' => variable_get('favicon_generator_margin', 4),
+      'margin' => variable_get('favicon_generator_margin', 4),
       'background_color' => variable_get('favicon_generator_color', '#00aba9'),
+      'keep_picture_in_circle' => variable_get('favicon_generator_ff_incircle', 1) == 1 ? 'true' : 'false',
     );
   }
   elseif ($ff == 'rsquare') {
