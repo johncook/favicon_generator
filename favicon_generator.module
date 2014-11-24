@@ -16,8 +16,8 @@ function favicon_generator_menu() {
   $items['admin/config/user-interface/favicon_generator'] = array(
     'title' => 'Real Favicon Generator',
     'description' => 'Configure how the icons appear',
-    // TODO: Change permissions.
-    'access callback' => TRUE,
+    'access callback' => 'user_access',
+    'access arguments' => array('administer themes'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('favicon_generator_settings'),
     'file' => 'favicon_generator.admin.inc',
