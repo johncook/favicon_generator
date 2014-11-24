@@ -51,10 +51,13 @@ function favicon_generator_form_system_theme_settings_alter(&$form, &$form_state
  * Called via favicon_generator_form_system_theme_settings_alter.
  */
 function favicon_generator_theme_form_submit($form, &$form_state) {
-  // TODO: Re-write fast-fail code.
   $values = $form_state['values'];
   $settings = variable_get($values['var'], '');
   if (empty($settings)) {
+    return;
+  }
+
+  if ($values['default_favicon']) {
     return;
   }
 
@@ -62,8 +65,6 @@ function favicon_generator_theme_form_submit($form, &$form_state) {
   if ($img_info == FALSE) {
     return;
   }
-
-  /* TODO: Process 'use default' option. */
 
   $errors = FALSE;
   if ($img_info['width'] != $img_info['height']) {
@@ -102,7 +103,6 @@ function favicon_generator_theme_form_submit($form, &$form_state) {
  */
 function favicon_generator_page_build(&$page) {
   $html = theme_get_setting('favicon_generator_html');;
-
   if (!empty($html)) {
     $element = array(
       '#type' => 'markup',
@@ -150,7 +150,6 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
       'max_redirects' => 0,
       'headers' => array(
         'Content-Type' => 'application/json',
-        /* 'Accept' => 'application/json', */
       ),
     )
   );
@@ -318,15 +317,12 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
     'favicon_generation' => array(
       'api_key' => 'ba2bae2dbffde5251857e412a8576c3ef259dd4b',
       'master_picture' => array(
-        /* 'type' => 'url', */
-        /* 'url' => theme_get_setting('favicon'), */
         'type' => 'inline',
         'content' => base64_encode(file_get_contents($icon_filename)),
       ),
       'files_location' => array(
         'type' => 'path',
         'path' => '/' . variable_get('file_public_path', conf_path() . '/files') . '/' . $path,
-        /* 'path' =>  . variable_get('favicon_generator_path', ''), */
       ),
       'favicon_design' => array(),
       'settings' => array(
@@ -392,12 +388,6 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
       'background_color' => variable_get('favicon_generator_color', '#00aba9'),
     );
   }
-  /*
-  'app_name' => 'My sample app',
-  'app_description' => 'Yet another sample application',
-  'developer_name' => 'Philippe Bernard',
-  'developer_url' => 'http://stackoverflow.com/users/499917/philippe-b',
-  */
 
   // Android Settings.
   $android = variable_get('favicon_generator_android', 'shadow');
@@ -420,14 +410,7 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
   }
   $request['favicon_generation']['favicon_design']['android_chrome']['manifest'] = array(
     'name' => variable_get('site_name'),
-    /*
-    'display' => 'standalone',
-    'orientation' => 'portrait',
-    'start_url' => '/homepage.html',
-    */
   );
-
-  /* TODO: Coast. */
 
   return $request;
 }
