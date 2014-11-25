@@ -400,4 +400,3 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
 
   return $request;
 }
-
