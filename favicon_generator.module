@@ -10,7 +10,6 @@
  * Implements hook_menu().
  */
 function favicon_generator_menu() {
-
   $items = array();
 
   $items['admin/config/user-interface/favicon_generator'] = array(
@@ -23,15 +22,6 @@ function favicon_generator_menu() {
     'file' => 'favicon_generator.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
-
-  /* Temp for testing */
-  $items['api/favicon'] = array(
-    'title' => 'favicon_generator',
-    'page callback' => 'favicon_generator_json_return',
-    'access callback' => TRUE,
-    'type' => MENU_CALLBACK,
-  );
-  /* End Temp for testing */
 
   return $items;
 }
@@ -140,10 +130,6 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
 
   $response = drupal_http_request(
     'http://realfavicongenerator.net/api/favicon.php',
-    /*
-    Testing URL.
-    'http://localhost/api/favicon',
-    */
     array(
       'method' => 'POST',
       'data' => json_encode(_favicon_generator_get_request_array($icon_filename, $path_base)),
@@ -415,11 +401,3 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
   return $request;
 }
 
-/**
- * Temp for testing.
- */
-function favicon_generator_json_return() {
-  $r = json_decode('{"favicon_generation_result":{"result":{"status":"success","error_message":"Invalid API key"},"favicon":{"package_url":"http:\/\/localhost\/favicons.zip","html_code":"<link rel=\"shortcut icon\" href=\"\/sites\/default\/files\/favicon\/favicon.ico\">\n<link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-57x57.png\">\n<link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-114x114.png\">\n<link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-72x72.png\">\n<link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-144x144.png\">\n<link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-60x60.png\">\n<link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-120x120.png\">\n<link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-76x76.png\">\n<link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-152x152.png\">\n<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"\/sites\/default\/files\/favicon\/apple-touch-icon-180x180.png\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-192x192.png\" sizes=\"192x192\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-160x160.png\" sizes=\"160x160\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-96x96.png\" sizes=\"96x96\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-16x16.png\" sizes=\"16x16\">\n<link rel=\"icon\" type=\"image\/png\" href=\"\/sites\/default\/files\/favicon\/favicon-32x32.png\" sizes=\"32x32\">\n<meta name=\"msapplication-TileColor\" content=\"#00aba9\">\n<meta name=\"msapplication-TileImage\" content=\"\/sites\/default\/files\/favicon\/mstile-144x144.png\">\n<meta name=\"msapplication-config\" content=\"\/sites\/default\/files\/favicon\/browserconfig.xml\">\n<link rel=\"manifest\" href=\"\/sites\/default\/files\/favicon\/android_chrome_manifest.json\">","compression":"true"},"files_location":{"type":"path","path":"\/sites\/default\/files\/favicon"},"preview_picture_url":"http:\/\/localhost\/favicon_preview.png","versions":"0.9"}}');
-  drupal_json_output($r);
-}
-/* End Temp for testing. */
