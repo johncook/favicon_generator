@@ -51,7 +51,9 @@ function favicon_generator_theme_form_submit($form, &$form_state) {
     return;
   }
 
-  $img_info = image_get_info($settings['favicon_path']);
+  $icon_name = _favicon_generator_resize_icon($settings['favicon_path'], TRUE);
+
+  $img_info = image_get_info($icon_name);
   if ($img_info == FALSE) {
     return;
   }
@@ -74,11 +76,12 @@ function favicon_generator_theme_form_submit($form, &$form_state) {
     drupal_set_message(t('Your icon should be at least 260x260 for optimal results.'), 'warning');
   }
 
-  $result = _favicon_generator_download_and_save_icons($settings['favicon_path'], isset($settings['theme']) ? $settings['theme'] : NULL);
+  $result = _favicon_generator_download_and_save_icons($icon_name, isset($settings['theme']) ? $settings['theme'] : NULL);
 
   if (is_array($result)) {
     $array = variable_get($values['var'], array());
     $array = array_merge($array, $result);
+    $array['favicon_path'] = $icon_name;
     variable_set($values['var'], $array);
     drupal_set_message(t('Favicons created'));
   }
@@ -399,4 +402,81 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
   );
 
   return $request;
+}
+
+/**
+ * Helper function to resize the icon.
+ *
+ * Resizes the provided icon file so that it is square and at least 70x70px.
+ *
+ * @param string $icon_filename
+ *   The file name of the provided icon.
+ * @param bool $notify
+ *   Set to true to report an image resize to the user.
+ *
+ * @return string
+ *   Returns the original filename if the format is OK or there is an error.
+ *   If the file needed resizing, the filename of the new file is returned.
+ */
+function _favicon_generator_resize_icon($icon_filename, $notify = FALSE) {
+  $img = image_load($icon_filename);
+  if ($img === FALSE) {
+    return $icon_filename;
+  }
+
+  $max_size = $img->info['width'] > $img->info['height'] ? $img->info['width'] : $img->info['height'];
+  if (($img->info['width'] == $img->info['height']) && ($max_size >= 70)) {
+    return $icon_filename;
+  }
+
+  $newimg = imagecreatetruecolor($max_size, $max_size);
+  if ($newimg === FALSE) {
+    return $icon_filename;
+  }
+  if (!imagesavealpha($newimg, TRUE)) {
+    return $icon_filename;
+  }
+  if (!imagealphablending($newimg, FALSE)) {
+    return $icon_filename;
+  }
+  if (!imagesavealpha($img->resource, TRUE)) {
+    return $icon_filename;
+  }
+  $bg = imagecolorallocatealpha($newimg, 255, 255, 255, 127);
+  if ($bg === FALSE) {
+    return $icon_filename;
+  }
+  if (!imagefilledrectangle($newimg, 0, 0, $max_size, $max_size, $bg)) {
+    return $icon_filename;
+  }
+
+  $l = ($max_size - $img->info['width']) / 2;
+  $t = ($max_size - $img->info['height']) / 2;
+  if (!imagecopy($newimg, $img->resource, $l, $t, 0, 0, $img->info['width'], $img->info['height'])) {
+    return $icon_filename;
+  }
+
+  $newfn = $img->source;
+  $newfn = preg_replace('/' . $img->info['extension'] . '$/', 'resized.png', $newfn);
+  $img->resource = $newimg;
+  $img->info['width'] = $max_size;
+  $img->info['height'] = $max_size;
+  $img->info['extension'] = 'png';
+  $img->info['mime_type'] = 'image/png';
+  $img->source = $newfn;
+
+  if ($max_size < 70) {
+    if (!image_resize($img, 70, 70)) {
+      return $icon_filename;
+    }
+    else {
+      drupal_set_message(t('The icon was resized. For best results the image must be at least 70x70, preferably 270x270.'));
+    }
+  }
+
+  if (!image_save($img)) {
+    return $icon_filename;
+  }
+
+  return $newfn;
 }
