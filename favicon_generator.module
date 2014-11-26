@@ -321,85 +321,12 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
     ),
   );
 
-  // iOS Settings.
-  $ios = variable_get('favicon_generator_ios', 'colored');
-  if ($ios == 'colored') {
-    $request['favicon_generation']['favicon_design']['ios'] = array(
-      'picture_aspect' => 'background_and_margin',
-      'margin' => variable_get('favicon_generator_margin', 4),
-      'background_color' => variable_get('favicon_generator_color', '#00aba9'),
-    );
-  }
-  elseif ($ios == 'transparent') {
-    $request['favicon_generation']['favicon_design']['ios'] = array(
-      'picture_aspect' => 'no_change',
-    );
-  }
-
-  // Windows 8 Settings.
-  $win = variable_get('favicon_generator_windows', 'colored');
-  if ($win == 'colored') {
-    $request['favicon_generation']['favicon_design']['windows'] = array(
-      'picture_aspect' => '',
-      'background_color' => variable_get('favicon_generator_color', '#00aba9'),
-    );
-  }
-  elseif ($win == 'white') {
-    $request['favicon_generation']['favicon_design']['windows'] = array(
-      'picture_aspect' => 'white_silhouette',
-      'background_color' => variable_get('favicon_generator_color', '#00aba9'),
-    );
-  }
-
-  // Firefox Settings.
-  $ff = variable_get('favicon_generator_ff');
-  if ($ff == 'circle') {
-    $request['favicon_generation']['favicon_design']['firefox_app'] = array(
-      'picture_aspect' => 'circle',
-      'keep_picture_in_circle' => 'true',
-      'circle_inner_margin' => variable_get('favicon_generator_margin', 4),
-      'margin' => variable_get('favicon_generator_margin', 4),
-      'background_color' => variable_get('favicon_generator_color', '#00aba9'),
-      'keep_picture_in_circle' => variable_get('favicon_generator_ff_incircle', 1) == 1 ? 'true' : 'false',
-    );
-  }
-  elseif ($ff == 'rsquare') {
-    $request['favicon_generation']['favicon_design']['firefox_app'] = array(
-      'picture_aspect' => 'rounded_square',
-      'margin' => variable_get('favicon_generator_margin', 4),
-      'background_color' => variable_get('favicon_generator_color', '#00aba9'),
-    );
-  }
-  elseif ($ff == 'square') {
-    $request['favicon_generation']['favicon_design']['firefox_app'] = array(
-      'picture_aspect' => 'square',
-      'margin' => variable_get('favicon_generator_margin', 4),
-      'background_color' => variable_get('favicon_generator_color', '#00aba9'),
-    );
-  }
-
-  // Android Settings.
-  $android = variable_get('favicon_generator_android', 'shadow');
-  if ($android == 'transparent') {
-    $request['favicon_generation']['favicon_design']['android_chrome'] = array(
-      'picture_aspect' => 'no_change',
-    );
-  }
-  elseif ($android == 'colored') {
-    $request['favicon_generation']['favicon_design']['android_chrome'] = array(
-      'picture_aspect' => 'background_and_margin',
-      'margin' => variable_get('favicon_generator_margin', 4),
-      'background_color' => variable_get('favicon_generator_color', '#00aba9'),
-    );
-  }
-  elseif ($android == 'shadow') {
-    $request['favicon_generation']['favicon_design']['android_chrome'] = array(
-      'picture_aspect' => 'shadow',
-    );
-  }
-  $request['favicon_generation']['favicon_design']['android_chrome']['manifest'] = array(
-    'name' => variable_get('site_name'),
+  $settings = array(
+    'color' => variable_get('favicon_generator_color', '#00aba9'),
+    'margin' => variable_get('favicon_generator_margin', 4),
   );
+
+  $request['favicon_generation']['favicon_design'] = array_merge($request['favicon_generation']['favicon_design'], module_invoke_all('favicon_generator_spec', $settings));
 
   return $request;
 }

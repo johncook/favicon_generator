@@ -75,64 +75,7 @@ function favicon_generator_settings() {
     '#default_value' => variable_get('favicon_generator_margin', 4),
   );
 
-  // IO Picture Aspect.
-  // 57x57px.
-  $form['favicon_generator_ios'] = array(
-    '#type' => 'select',
-    '#title' => t('IOS Style'),
-    '#options' => array(
-      'transparent' => t('Transparent Background'),
-      'colored' => t('Colored Background'),
-    ),
-    '#default_value' => variable_get('favicon_generator_ios', 'colored'),
-  );
-
-  // Windows Picture Aspect.
-  // 50x50 icon on 101x101 tile.
-  $form['favicon_generator_windows'] = array(
-    '#type' => 'select',
-    '#title' => t('Windows 8 Style'),
-    '#options' => array(
-      'colored' => t('Use the icon as is'),
-      'white' => t('Turn the icon into a white silhouette'),
-    ),
-    '#default_value' => variable_get('favicon_generator_windows', 'colored'),
-  );
-
-  // Firefox Picture Aspect.
-  $form['favicon_generator_ff'] = array(
-    '#type' => 'select',
-    '#title' => 'Firefox OS Style',
-    '#options' => array(
-      'circle' => t('Circle'),
-      'rsquare' => t('Rounded Square'),
-      'square' => t('Square'),
-    ),
-    '#default_value' => variable_get('favicon_generator_ff', 'circle'),
-  );
-  $form['favicon_generator_ff_incircle'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Keep picture in circle'),
-    '#description' => t('If checked, the icon is cropped in order to fit the circle. Else, the icon may extend beyond the circle.'),
-    '#default_value' => variable_get('favicon_generator_ff_incircle', 1),
-    '#states' => array(
-      'visible' => array(
-        ':input[name="favicon_generator_ff"]' => array('value' => 'circle'),
-      ),
-    ),
-  );
-
-  // Android Picture Aspect.
-  $form['favicon_generator_android'] = array(
-    '#type' => 'select',
-    '#title' => 'Android Style',
-    '#options' => array(
-      'transparent' => t('Transparent Background'),
-      'colored' => t('Colored Background'),
-      'shadow' => t('Add Shadow'),
-    ),
-    '#default_value' => variable_get('favicon_generator_android', 'shadow'),
-  );
+  $form = array_merge($form, module_invoke_all('favicon_generator_admin'));
 
   $form['favicon_generator_path'] = array(
     '#type' => 'textfield',
