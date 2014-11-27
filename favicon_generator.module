@@ -115,6 +115,45 @@ function favicon_generator_html_head_alter(&$head_elements) {
 }
 
 /**
+ * Implements hook_help().
+ */
+function favicon_generator_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#favicon_generator':
+      $path = dirname(__FILE__) . '/README.md';
+      if (file_exists($path)) {
+        $readme = file_get_contents($path);
+      }
+      else {
+        $path = dirname(__FILE__) . '/README.txt';
+        if (file_exists($path)) {
+          $readme = file_get_contents($path);
+        }
+      }
+      if (!isset($readme)) {
+        return NULL;
+      }
+      if (module_exists('markdown')) {
+        $filters = module_invoke('markdown', 'filter_info');
+        $info = $filters['filter_markdown'];
+
+        if (function_exists($info['process callback'])) {
+          $function = $info['process callback'];
+          $output = filter_xss_admin($function($readme, NULL));
+        }
+        else {
+          $output = '<pre>' . check_plain($readme) . '</pre>';
+        }
+      }
+      else {
+        $output = '<pre>' . check_plain($readme) . '</pre>';
+      }
+
+      return $output;
+  }
+}
+
+/**
  * Function to process the downloading, saving and un-zipping of the icons.
  *
  * @param string $icon_filename

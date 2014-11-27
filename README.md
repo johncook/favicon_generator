@@ -1,6 +1,7 @@
 INTRODUCTION
 ------------
-Favicon creator using Real Favicon Generator API. see http://realfavicongenerator.net/
+Favicon creator using Real Favicon Generator API.
+See http://realfavicongenerator.net/
 
 Creates icons for:
  * iOS
@@ -32,7 +33,8 @@ INSTALLATION
 
 CONFIGURATION
 -------------
- * Configure the icon settings in Configuration » User Interface » Real Favicon Generator
+ * Configure the icon settings in Configuration » User Interface » Real
+   Favicon Generator
    /admin/config/user-interface/favicon_generator
 
  * Select an icon in Appearance » Settings or Appearance » [Theme] » Settings
