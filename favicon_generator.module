@@ -209,9 +209,9 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
   }
 
   // All OK here.
-  $package = $r->favicon_generation_result->favicon->package_url;
-  $html = $r->favicon_generation_result->favicon->html_code;
-  $version = isset($r->favicon_generation_result->version) ? $r->favicon_generation_result->version : '0.0';
+  $package = check_url($r->favicon_generation_result->favicon->package_url);
+  $html = filter_xss($r->favicon_generation_result->favicon->html_code, array('link', 'meta'));
+  $version = isset($r->favicon_generation_result->version) ? check_plain($r->favicon_generation_result->version) : '0.0';
 
   $path = file_build_uri($path_base);
 
