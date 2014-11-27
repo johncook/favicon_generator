@@ -11,7 +11,7 @@ function favicon_generator_firefox_favicon_generator_admin() {
   $form = array();
   $form['favicon_generator_firefox'] = array(
     '#type' => 'select',
-    '#title' => 'Firefox OS Style',
+    '#title' => t('Firefox OS Style'),
     '#options' => array(
       'circle' => t('Circle'),
       'rsquare' => t('Rounded Square'),

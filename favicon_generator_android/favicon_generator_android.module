@@ -12,7 +12,7 @@ function favicon_generator_android_favicon_generator_admin() {
   // Android Picture Aspect.
   $form['favicon_generator_android'] = array(
     '#type' => 'select',
-    '#title' => 'Android Style',
+    '#title' => t('Android Style'),
     '#options' => array(
       'transparent' => t('Transparent Background'),
       'colored' => t('Colored Background'),
