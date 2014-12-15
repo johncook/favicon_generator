@@ -6,7 +6,9 @@
  */
 
 /**
- * Implements hook_settings().
+ * Form builder; This function allows configuration in administration sections.
+ *
+ * @see system_settings_form()
  */
 function favicon_generator_settings() {
   $form = array();
