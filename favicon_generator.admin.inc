@@ -3,8 +3,6 @@
 /**
  * @file
  * Contains admin UI.
- *
- * @author JohnCook
  */
 
 /**
