@@ -130,12 +130,6 @@ function favicon_generator_help($path, $arg) {
       if (file_exists($path)) {
         $readme = file_get_contents($path);
       }
-      else {
-        $path = dirname(__FILE__) . '/README.txt';
-        if (file_exists($path)) {
-          $readme = file_get_contents($path);
-        }
-      }
       if (!isset($readme)) {
         return NULL;
       }
