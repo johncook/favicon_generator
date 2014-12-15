@@ -88,8 +88,8 @@ function favicon_generator_theme_form_submit($form, &$form_state) {
     variable_set($values['var'], $array);
     drupal_set_message(t('Favicons created'));
   }
-  else if ($result != FALSE) {
-    drupal_set_message(t($result), 'error');
+  elseif ($result != FALSE) {
+    drupal_set_message($result, 'error');
   }
   else {
     drupal_set_message(t('An error occurred while fetching the icon set. Please try again later.'), 'error');
