@@ -96,7 +96,7 @@ function favicon_generator_settings() {
  */
 function favicon_generator_settings_form_submit($form, &$form_state) {
   drupal_set_message(
-    t('(Re)upload your icon at !link to rebuild the favicon set.',
+    t('(Re-)save your theme settings at !link to rebuild the favicon set.',
       array(
         '!link' => l(
           url(
