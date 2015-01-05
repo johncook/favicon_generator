@@ -84,5 +84,28 @@ function favicon_generator_settings() {
     '#default_value' => variable_get('favicon_generator_path', ''),
   );
 
+  $form['#submit'][] = 'favicon_generator_settings_form_submit';
+
   return system_settings_form($form);
+}
+
+/**
+ * Additional submit handler for the settings form.
+ *
+ * Displays a message to reupload the favicon.
+ */
+function favicon_generator_settings_form_submit($form, &$form_state) {
+  drupal_set_message(
+    t('(Re)upload your icon at !link to rebuild the favicon set.',
+      array(
+        '!link' => l(
+          url(
+            'admin/appearance/settings',
+            array('absolute' => TRUE)
+          ),
+          'admin/appearance/settings'
+        ),
+      )
+    )
+  );
 }
