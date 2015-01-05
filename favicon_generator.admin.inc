@@ -48,7 +48,7 @@ function favicon_generator_settings() {
     $form['favicon_generator_color']['#description'] .=
       '<div class="color-preset" style="background-color: #' . $hex . ';" >' . $name . '<br/>#' . $hex . '</div>';
   }
-  $form['favicon_generator_color']['#description'] .= '</ div>';
+  $form['favicon_generator_color']['#description'] .= '</div>';
 
   // Margin.
   $form['favicon_generator_margin'] = array(
