@@ -9,7 +9,7 @@ Creates icons for:
  * Firefox
  * Android
 
- * For a full description of the moule, visit the project page:
+ * For a full description of the module, visit the project page:
    https://www.drupal.org/sandbox/johncook/2378569
 
  * To submit bug reports and feature suggestions, or to track changes:
