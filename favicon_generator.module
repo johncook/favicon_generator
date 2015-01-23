@@ -446,7 +446,7 @@ function _favicon_generator_resize_icon($icon_filename, $notify = FALSE) {
       return $icon_filename;
     }
     else {
-      drupal_set_message(t('The icon was resized. For best results the image must be at least 70x70, preferably 270x270.'));
+      drupal_set_message(t('The icon was resized. For best results the image must be at least 70x70, preferably 300x30.'));
     }
   }
 
