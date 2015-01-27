@@ -226,6 +226,7 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
         array('%error_msg' => $r->favicon_generation_result->result->error_message),
         WATCHDOG_WARNING
       );
+      return $r->favicon_generation_result->result->error_message;
     }
     else {
       watchdog(
@@ -275,7 +276,9 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
       array('%path' => $path),
       WATCHDOG_WARNING
     );
-    return FALSE;
+    return t('Icon directory, %path, does not exist and could not be created.',
+      array('%path' => $path)
+    );
   }
 
   // Download zip file.
@@ -294,7 +297,7 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
       array('%package' => $package),
       WATCHDOG_WARNING
     );
-    return FALSE;
+    return t('The icon package file could not be downloaded.');
   }
 
   // Save zip file.
@@ -306,7 +309,9 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
       array('%zip_uri' => $zip_uri),
       WATCHDOG_WARNING
     );
-    return FALSE;
+    return t('The icon package could not be saved to %zip_uri.',
+      array('%zip_uri' => $zip_uri)
+    );
   }
 
   $zip_path = variable_get('file_public_path', conf_path() . '/files') . '/' . file_uri_target($zip_uri);
@@ -321,11 +326,11 @@ function _favicon_generator_download_and_save_icons($icon_filename, $theme = NUL
       array('%err' => $res),
       WATCHDOG_WARNING
     );
-    return FALSE;
+    return 'There was a problem extracting the icon files.';
   }
   if (!$zip->extractTo($path)) {
     watchdog('favicon_generator', 'There was a problem extracting the icon files.', NULL, WATCHDOG_WARNING);
-    return FALSE;
+    return 'There was a problem extracting the icon files.';
   }
   $zip->close();
 
