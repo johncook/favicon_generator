@@ -38,5 +38,25 @@ function hook_favicon_generator_spec(array $settings) {
 }
 
 /**
+ * Get the minimum size for the icon file in px.
+ *
+ * @return int
+ *   The minimum size for the icon file.
+ */
+function hook_favicon_generator_min_size() {
+  return 80;
+}
+
+/**
+ * Get the recommended minimum size for the icon file in px.
+ *
+ * @return int
+ *   The recommended size for the icon file.
+ */
+function hook_favicon_generator_rec_size() {
+  return 260;
+}
+
+/**
  * @} End of "addtogroup hooks".
  */
