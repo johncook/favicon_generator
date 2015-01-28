@@ -10,6 +10,7 @@ Creates icons for:
  * Android
  * OpenGraph
  * Coast
+ * Yandex
 
  * For a full description of the module, visit the project page:
    https://www.drupal.org/sandbox/johncook/2378569
