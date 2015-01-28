@@ -8,6 +8,8 @@ Creates icons for:
  * Windows 8
  * Firefox
  * Android
+ * OpenGraph
+ * Coast
 
  * For a full description of the module, visit the project page:
    https://www.drupal.org/sandbox/johncook/2378569
