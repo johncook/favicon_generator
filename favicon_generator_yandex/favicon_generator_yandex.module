@@ -31,7 +31,7 @@ function favicon_generator_yandex_favicon_generator_spec($settings) {
   $title = variable_get('favicon_generator_yandex', 1);
   $array['yandex_browser']['background_color'] = $settings['color'];
   $array['yandex_browser']['manifest'] = array(
-    'show_title' => $title == 1 ? true : false,
+    'show_title' => $title == 1 ? TRUE : FALSE,
     'version' => '1.0',
   );
 

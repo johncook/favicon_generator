@@ -56,12 +56,12 @@ function favicon_generator_theme_form_submit($form, &$form_state) {
 
   $min_size = 70;
   $rec_size = 260;
-  
-  foreach (module_implements('favicon_generator_min_size') as $module ) {
+
+  foreach (module_implements('favicon_generator_min_size') as $module) {
     $size = module_invoke($module, 'favicon_generator_min_size');
     $min_size = $size > $min_size ? $size : $min_size;
   }
-  foreach (module_implements('favicon_generator_rec_size') as $module ) {
+  foreach (module_implements('favicon_generator_rec_size') as $module) {
     $size = module_invoke($module, 'favicon_generator_min_size');
     $rec_size = $size > $rec_size ? $size : $rec_size;
   }
@@ -75,7 +75,7 @@ function favicon_generator_theme_form_submit($form, &$form_state) {
   }
 
   $errors = FALSE;
-  
+
   if ($img_info['width'] != $img_info['height']) {
     $errors = TRUE;
     drupal_set_message(t('Icon image must be square.'), 'error');
@@ -402,7 +402,8 @@ function _favicon_generator_get_request_array($icon_filename, $path) {
 /**
  * Helper function to resize the icon.
  *
- * Resizes the provided icon file so that it is square and at least the specified size.
+ * Resizes the provided icon file so that it is square and at least the
+ * specified size.
  *
  * @param string $icon_filename
  *   The file name of the provided icon.
