@@ -9,5 +9,5 @@
 /**
  * Implements hook_uninstall().
  */
-function favicon_generator_windows_uninstall() {
+function favicon_generator_opengraph_uninstall() {
 }
