@@ -8,7 +8,7 @@
   vertical-align: top;
 }
 
-#favicon-generator-settings .form-item-fastagingvicon-generator-color
+#favicon-generator-settings .form-item-favicon-generator-color
 .color-presets .color-preset {
   width: 45px;
   height: 45px;
@@ -20,3 +20,4 @@
   font-weight: bold;
   cursor: pointer;
 }
+
